@@ -5,6 +5,7 @@
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+#include "driver/adc.h"
 #include <sys/time.h>
 
 #define ECHO_PIN GPIO_NUM_4
@@ -66,8 +67,27 @@ void app_main(void)
     gpio_set_direction(ECHO_PIN, GPIO_MODE_INPUT);
 
 
+    // Configure analog input
+    ESP_ERROR_CHECK(adc1_config_width(ADC_WIDTH_12Bit));
+    ESP_ERROR_CHECK(adc1_config_channel_atten(ADC1_CHANNEL_7, ADC_ATTEN_0db));
+
+
+    int times=10;
     //int level = 0;
     while (true) {
+
+        // Max sonar analog input
+        times=2;
+        while (times-->0) {
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            unsigned int val=adc1_get_voltage(ADC1_CHANNEL_7);
+                printf("ADC value : %d\n",val );
+                double distance = 1024.0*val/6.6;    // cm
+                printf("Distance: %f cm\n",distance/1000.0 );  // mV??
+        }
+
+
+        // HC-SR04P
         gpio_set_level(TRIG_PIN, 1);
         vTaskDelay(100 / portTICK_PERIOD_MS);
         gpio_set_level(TRIG_PIN, 0);

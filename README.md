@@ -20,6 +20,30 @@ https://www.sparkfun.com/products/13907
 
 ![connection](connect.png)
 
+#Max sonar sensor.
+
+http://www.maxbotix.com/documents/HRLV-MaxSonar-EZ_Datasheet.pdf
+
+Later I will use the TTL uart interface. But as starting point I will use the analog-voltage pin.
+On my sensor it should output a value of (Vcc*2/1024) per 10 mm.
+Vdist = dist * 3.3*2/*1024        in cm
+dist=Vdist*1024.0/6.6
+```
+
+ESP_ERROR_CHECK(adc1_config_width(ADC_WIDTH_12Bit));
+ESP_ERROR_CHECK(adc1_config_channel_atten(ADC1_CHANNEL_7, ADC_ATTEN_0db));
+
+int times=10;
+while (times-->0) {
+   vTaskDelay(1000 / portTICK_PERIOD_MS);
+   unsigned int val=adc1_get_voltage(ADC1_CHANNEL_7);
+        printf("ADC value : %d\n",val );
+        double distance = 1024.0*val/6.6;    // mm
+        printf("Distance: %f cm\n",distance/10000.0 );
+
+}
+```
+
 
 ---------------
 
