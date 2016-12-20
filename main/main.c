@@ -5,7 +5,7 @@
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
-#include "driver/adc.h"
+//#include "driver/adc.h"
 #include <sys/time.h>
 
 #define ECHO_PIN GPIO_NUM_4
@@ -23,8 +23,8 @@ uint32_t get_usec() {
  struct timeval tv;
 
  //              struct timeval {
- //                time_t      tv_sec;     // seconds 
- //                suseconds_t tv_usec;    // microseconds 
+ //                time_t      tv_sec;     // seconds
+ //                suseconds_t tv_usec;    // microseconds
  //              };
 
  gettimeofday(&tv,NULL);
@@ -67,10 +67,11 @@ void app_main(void)
     gpio_set_direction(ECHO_PIN, GPIO_MODE_INPUT);
 
 
+#ifdef MAX_SONAR
     // Configure analog input
     ESP_ERROR_CHECK(adc1_config_width(ADC_WIDTH_12Bit));
     ESP_ERROR_CHECK(adc1_config_channel_atten(ADC1_CHANNEL_7, ADC_ATTEN_0db));
-
+#endif
 
     int times=10;
     //int level = 0;
@@ -78,6 +79,7 @@ void app_main(void)
 
         // Max sonar analog input
         times=2;
+#ifdef MAX_SONAR
         while (times-->0) {
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             unsigned int val=adc1_get_voltage(ADC1_CHANNEL_7);
@@ -85,7 +87,7 @@ void app_main(void)
                 double distance = 1024.0*val/6.6;    // cm
                 printf("Distance: %f cm\n",distance/1000.0 );  // mV??
         }
-
+#endif
 
         // HC-SR04P
         gpio_set_level(TRIG_PIN, 1);
@@ -122,4 +124,3 @@ void app_main(void)
     }
 
 }
-
