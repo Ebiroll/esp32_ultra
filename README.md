@@ -95,3 +95,17 @@ When running in qemu, the following ports are accessed.
   io read 44098
   io write 44098,0
 ```
+
+```
+Example boot
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0x00
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3ffc0008,len:0
+load:0x3ffc0008,len:1964
+load:0x40078000,len:3668
+load:0x40080000,len:260
+entry 0x40080034
+
+```

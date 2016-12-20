@@ -12,6 +12,30 @@
 #define TRIG_PIN GPIO_NUM_15
 
 
+#if 0
+  uart_port_t uart_num = UART_NUM_2;                                     //uart port number
+  uart_config_t uart_config = {
+      .baud_rate = 115200,                    //baudrate
+      .data_bits = UART_DATA_8_BITS,          //data bit mode
+      .parity = UART_PARITY_DISABLE,          //parity mode
+      .stop_bits = UART_STOP_BITS_1,          //stop bit mode
+      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,  //hardware flow control(cts/rts)
+      .rx_flow_ctrl_thresh = 122,             //flow control threshold
+  };
+  ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
+  ESP_ERROR_CHECK( uart_param_config(uart_num, &uart_config));
+  QueueHandle_t uart_queue;
+  ESP_ERROR_CHECK( uart_set_pin(uart_num, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+  ESP_ERROR_CHECK( uart_driver_install(uart_num, 1024 * 2, 1024 * 2, 10, UART_INTR_NUM, &uart_queue));
+
+  char* test_str = "This is a test string.\n";
+  uart_tx_chars(uart_num, (const char*)test_str,strlen(test_str));
+  printf("ESP32 uart Send\n");
+  while(1);
+
+#endif
+
+
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     return ESP_OK;
