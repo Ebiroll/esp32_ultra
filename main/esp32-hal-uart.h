@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#define ESP_REG(addr) *((volatile uint32_t *)(addr))
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
