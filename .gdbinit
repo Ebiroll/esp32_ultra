@@ -72,9 +72,11 @@ define _freertos_show_thread_item
 		set $prev_list_elem_ptr = $list_elem_ptr
 		set $list_elem_ptr = $prev_list_elem_ptr->pxPrevious
 		if ($threadid == $current_thread)
-			printf "0x%x\t%s\t%x\t%x\t%d<---RUNNING\n", $threadid, $thread_name_str, $core_id, $stack, $stack_top-$stack 
+			printf "0x%x\t%s\t0x%x\t0x%x\t0x%x\t%d<---RUNNING\n", $threadid, $thread_name_str, $core_id, $stack, $stack_top ,$stack_top-$stack 
 		else
-			printf "0x%x\t%s\t%x\t%x\t%d\n", $threadid, $thread_name_str, $core_id, $stack, $stack_top-$stack 
+			printf "0x%x\t%s\t0x%x\t0x%x\t0x%x\t%d\n", $threadid, $thread_name_str, $core_id, $stack, $stack_top , $stack_top-$stack 
 		end
+		if (*(unsigned int*)((*((tskTCB *)$threadid)).pxTopOfStack+4)>0x4000 & (*(unsigned int*)((*((tskTCB *)$threadid)).pxTopOfStack+4)<0x40C00000))
+		        x/3i *(unsigned int*) ((*((tskTCB *)$threadid)).pxTopOfStack+4)
 	end
 end
