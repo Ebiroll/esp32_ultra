@@ -11,7 +11,7 @@ A6lib::A6lib(int transmitPin, int receivePin) {
 #ifdef ESP8266
     A6conn = new SoftwareSerial(receivePin, transmitPin, false, 1024);
 #else
-    A6conn = new HardwareSerial(1);  // receivePin, transmitPin, false
+    A6conn = new HardwareSerial(2);  // receivePin, transmitPin, false
 #endif
     // Timeout time
     //A6conn->setTimeout(100);
