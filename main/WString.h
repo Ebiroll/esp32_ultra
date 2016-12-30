@@ -32,6 +32,10 @@
 // result objects are assumed to be writable by subsequent concatenations.
 class StringSumHelper;
 
+//class __FlashStringHelper;
+//#define F(string_literal) (reinterpret_cast<__FlashStringHelper *>(PSTR(string_literal)))
+#define F(string_literal) string_literal
+
 // an abstract class used as a means to proide a unique pointer type
 // but really has no body
 //class __FlashStringHelper;

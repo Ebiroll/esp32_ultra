@@ -311,7 +311,8 @@ void A6lib::enableSpeaker(byte enable) {
 
 long A6lib::detectRate() {
     unsigned long rate = 0;
-    unsigned long rates[] = {9600, 115200};
+    //unsigned long rates[] = {9600, 115200};
+    unsigned long rates[] = {115200};
 
     // Try to autodetect the rate.
     logln("Autodetecting connection rate...");
@@ -323,8 +324,8 @@ long A6lib::detectRate() {
         log(rate);
         logln("...");
 
-        delay(100);
-        if (A6command("\rAT", "OK", "+CME", 2000, 2, NULL) == A6_OK) {
+        delay(2000);
+        if (A6command("\rAT", "OK", "+CME", 4000, 2, NULL) == A6_OK) {
             return rate;
         }
     }

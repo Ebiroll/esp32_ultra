@@ -4,15 +4,20 @@
 #include "Arduino.h"
 //#include "SoftwareSerial.h"
 
-//typedef String std::string;
 
-#ifdef DEBUG
+
 #define log(msg) Serial.print(msg)
 #define logln(msg) Serial.println(msg)
-#else
-#define log(msg)
-#define logln(msg)
-#endif
+
+//#define logln(msg) Serial.println(msg)
+
+//#ifdef DEBUG
+//#define log(msg) Serial.print(msg)
+//#define logln(msg) Serial.println(msg)
+//#else
+//#define log(msg)
+//#define logln(msg)
+//#endif
 
 #define countof(a) (sizeof(a) / sizeof(a[0]))
 

@@ -51,6 +51,7 @@ while (times-->0) {
 
 #Start qemu
 
+Todo, measure time with xos_get_system_cycles()
 
 To start firmware.elf built by platformio
 

@@ -27,6 +27,7 @@
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "esp32-hal-matrix.h"
+#include "driver/uart.h"
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -152,7 +153,7 @@ void uartAttachRx(uart_t* uart, uint8_t rxPin, bool inverted)
         return;
     }
     // TODO, Set as input
-    //pinMode(rxPin, INPUT);
+    //pinMode(rxPin, INPUT);    
     pinMatrixInAttach(rxPin, UART_RXD_IDX(uart->num), inverted);
     uartEnableInterrupt(uart);
     uartEnableGlobalInterrupt();
@@ -202,6 +203,10 @@ uart_t* uartBegin(uint8_t uart_nr, uint32_t baudrate, uint32_t config, int8_t rx
     uart->dev->conf0.val = config;
     UART_MUTEX_UNLOCK();
 
+    // This replaces uartAttachRx & uartAttachTx
+    uart_set_pin(uart_nr, txPin, rxPin, -1 /*RTS*/, -1 /*CTS*/);
+
+#if 0
     if(rxPin != -1) {
         uartAttachRx(uart, rxPin, inverted);
     }
@@ -209,7 +214,7 @@ uart_t* uartBegin(uint8_t uart_nr, uint32_t baudrate, uint32_t config, int8_t rx
     if(txPin != -1) {
         uartAttachTx(uart, txPin, inverted);
     }
-
+#endif
     return uart;
 }
 

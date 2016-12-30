@@ -85,10 +85,12 @@ extern "C" void app_main(void)
 {
     nvs_flash_init();
 
+    Serial.begin(115200);
+
     A6lib A6l(7, 8);
     A6httplib httprequest(&A6l);
 
-    A6l.blockUntilReady(9600);
+    A6l.blockUntilReady(115200);
 
     httprequest.ConnectGPRS(apn);
     String rcvd_data=httprequest.Get(host,path);
