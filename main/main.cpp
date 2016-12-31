@@ -5,11 +5,16 @@
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
+#include "esp_log.h"
 //#include "driver/adc.h"
 #include <sys/time.h>
 
 #define ECHO_PIN GPIO_NUM_4
 #define TRIG_PIN GPIO_NUM_15
+
+static const char *TAG = "ultra";
+
 
 #include "Arduino.h"
 #include "A6lib.h"
@@ -29,11 +34,15 @@ String apn="airtelworld.com";
 String host="ipinfo.io";
 String path="/ip";
 
+#define BUF_SIZE 512
+
+static void uartTestTask(void *inpar) {
 
 
+//        rxPin = 16;
+//        txPin = 17;
+  uint8_t* data;
 
-
-#if 0
   uart_port_t uart_num = UART_NUM_2;                                     //uart port number
   uart_config_t uart_config = {
       .baud_rate = 115200,                    //baudrate
@@ -46,16 +55,29 @@ String path="/ip";
   ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
   ESP_ERROR_CHECK( uart_param_config(uart_num, &uart_config));
   QueueHandle_t uart_queue;
-  ESP_ERROR_CHECK( uart_set_pin(uart_num, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
-  ESP_ERROR_CHECK( uart_driver_install(uart_num, 1024 * 2, 1024 * 2, 10, UART_INTR_NUM, &uart_queue));
+  ESP_ERROR_CHECK( uart_set_pin(uart_num, 17, 16, -1, -1));
+  ESP_ERROR_CHECK( uart_driver_install(uart_num, 512 * 2, 512 * 2, 10,  &uart_queue,0));
 
-  char* test_str = "This is a test string.\n";
+  const char* test_str = "This is a test string.\r\n";
   uart_tx_chars(uart_num, (const char*)test_str,strlen(test_str));
   printf("ESP32 uart Send\n");
-  while(1);
+  data = (uint8_t*) malloc(BUF_SIZE);
 
-#endif
+  while(1) {
+     int len = uart_read_bytes(uart_num, data, BUF_SIZE, 1000 / portTICK_RATE_MS);
 
+     if (len>0) {
+         data[len]='\n';
+         data[len+1]=0;
+         printf("got %s\n",data);
+         uart_write_bytes(uart_num, (const char*) data, len);
+     }
+
+     vTaskDelay(100 / portTICK_PERIOD_MS);
+     uart_tx_chars(uart_num, (const char*)test_str,strlen(test_str));   
+  }
+
+}
 
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
@@ -81,11 +103,8 @@ uint32_t get_usec() {
   //return ret;
 }
 
-extern "C" void app_main(void)
-{
-    nvs_flash_init();
-
-    Serial.begin(115200);
+#if 0
+static void A6TestTask(void *data) {
 
     A6lib A6l(7, 8);
     A6httplib httprequest(&A6l);
@@ -96,6 +115,19 @@ extern "C" void app_main(void)
     String rcvd_data=httprequest.Get(host,path);
 //    Serial.println(rcvd_data);
     httprequest.getResponseData(rcvd_data);
+
+}
+#endif
+
+extern "C" void app_main(void)
+{
+    nvs_flash_init();
+
+    Serial.begin(115200);
+
+    xTaskCreatePinnedToCore(&uartTestTask, "uart", 8048, NULL, 5, NULL, 0);
+    //xTaskCreatePinnedToCore(&A6TestTask, "A6", 8048, NULL, 5, NULL, 0);
+
 
 
 

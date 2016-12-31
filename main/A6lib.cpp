@@ -325,7 +325,7 @@ long A6lib::detectRate() {
         logln("...");
 
         delay(2000);
-        if (A6command("\rAT", "OK", "+CME", 4000, 2, NULL) == A6_OK) {
+        if (A6command("\rAT", "OK", "+CME", 2000, 2, NULL) == A6_OK) {
             return rate;
         }
     }

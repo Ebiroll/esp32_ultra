@@ -1,13 +1,13 @@
 #include "Arduino.h"
 #include <sys/time.h>
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_attr.h"
 
-uint32_t millis() {
 
- struct timeval tv;
-
-
- gettimeofday(&tv,NULL);
- return (tv.tv_sec*1000 + tv.tv_usec*1000);
-
+uint32_t IRAM_ATTR millis()
+{
+    return xTaskGetTickCount() * portTICK_PERIOD_MS;
 }
 

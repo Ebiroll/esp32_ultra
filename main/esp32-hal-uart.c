@@ -206,7 +206,7 @@ uart_t* uartBegin(uint8_t uart_nr, uint32_t baudrate, uint32_t config, int8_t rx
     // This replaces uartAttachRx & uartAttachTx
     uart_set_pin(uart_nr, txPin, rxPin, -1 /*RTS*/, -1 /*CTS*/);
 
-#if 0
+    // Attach int
     if(rxPin != -1) {
         uartAttachRx(uart, rxPin, inverted);
     }
@@ -214,7 +214,6 @@ uart_t* uartBegin(uint8_t uart_nr, uint32_t baudrate, uint32_t config, int8_t rx
     if(txPin != -1) {
         uartAttachTx(uart, txPin, inverted);
     }
-#endif
     return uart;
 }
 
@@ -303,11 +302,13 @@ void uartFlush(uart_t* uart)
     UART_MUTEX_LOCK();
     while(uart->dev->status.txfifo_cnt);
 
-    uart->dev->conf0.txfifo_rst = 1;
-    uart->dev->conf0.txfifo_rst = 0;
+    // Not sure this is a good idea, 
+    // TODO, RESET necessary??
+    //uart->dev->conf0.txfifo_rst = 1;
+    //uart->dev->conf0.txfifo_rst = 0;
 
-    uart->dev->conf0.rxfifo_rst = 1;
-    uart->dev->conf0.rxfifo_rst = 0;
+    //uart->dev->conf0.rxfifo_rst = 1;
+    //uart->dev->conf0.rxfifo_rst = 0;
     UART_MUTEX_UNLOCK();
 }
 
