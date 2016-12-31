@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": ["/usr/include"],
+            "browse" : {
+                "limitSymbolsToIncludedHeaders" : true,
+                "databaseFilename" : ""
+            }
+        },
+        {
+            "name": "Linux",
+            "includePath": ["/usr/include",
+            "~/esp/esp-idf/components/freertos/include",
+            "~/esp/esp-idf/components/nvs_flash/include/",
+            "~/esp/esp-idf/components/esp32/include/",
+            "~/esp/esp-idf/components/log/include/",
+            "~/esp/esp-idf/components/driver/include/",
+            "~/esp/esp-idf/components/tcpip_adapter/include",
+            "~/esp/esp-idf/components/tcpip_adapter/include",
+            "~/esp/esp-idf/components/lwip/include",
+            "~/esp/esp-idf/components/lwip/include/lwip/port",
+            "~/esp/esp-idf/components/lwip/include/lwip",
+            "~/esp/esp-idf/"
+            ],
+            "browse" : {
+                "limitSymbolsToIncludedHeaders" : true,
+                "databaseFilename" : ""
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": ["c:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include"],
+            "browse" : {
+                "limitSymbolsToIncludedHeaders" : true,
+                "databaseFilename" : ""
+            }
+        }
+    ]
+}
