@@ -36,6 +36,56 @@ String path="/ip";
 
 #define BUF_SIZE 512
 
+// Later Try uart 1
+static void maxSonarInput(void *inpar) {
+
+
+//        rxPin = 9;
+//        txPin = 10;  // Not used
+  uint8_t* data;
+
+  uart_port_t uart_num = UART_NUM_1;                                     //uart port number
+  uart_config_t uart_config = {
+      .baud_rate = 9600,                      //baudrate
+      .data_bits = UART_DATA_8_BITS,          //data bit mode
+      .parity = UART_PARITY_DISABLE,          //parity mode
+      .stop_bits = UART_STOP_BITS_1,          //stop bit mode
+      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,  //hardware flow control(cts/rts)
+      .rx_flow_ctrl_thresh = 122,             //flow control threshold
+  };
+  ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
+  ESP_ERROR_CHECK( uart_param_config(uart_num, &uart_config));
+  QueueHandle_t uart_queue;
+  ESP_ERROR_CHECK( uart_set_pin(uart_num, -1, 2, -1, -1));
+  ESP_ERROR_CHECK( uart_driver_install(uart_num, 512 * 2, 512 * 2, 10,  &uart_queue,0));
+
+  //const char* test_str = "This is a test string.\r\n";
+  //uart_tx_chars(uart_num, (const char*)test_str,strlen(test_str));
+  printf("ESP32 uart Send\n");
+  data = (uint8_t*) malloc(BUF_SIZE);
+  // Sync
+  data[0]=0;
+  int len=0;
+  //while (data[0]!='R') {
+  //  len=uart_read_bytes(uart_num, data, 7, 100 / portTICK_RATE_MS);
+  //}
+
+  while(1) {
+    while (data[0]!='R') {
+         len=uart_read_bytes(uart_num, data, 1, 100 / portTICK_RATE_MS);
+     }
+     len = uart_read_bytes(uart_num, data, 4, 500 / portTICK_RATE_MS);
+     if (len==4) {
+         data[len]=0;
+         //data[len+1]=0;
+         printf("got %d:%s\n",len,data);
+     }
+  }
+
+}
+
+
+
 static void uartTestTask(void *inpar) {
 
 
@@ -125,7 +175,11 @@ extern "C" void app_main(void)
 
     Serial.begin(115200);
 
-    xTaskCreatePinnedToCore(&uartTestTask, "uart", 8048, NULL, 5, NULL, 0);
+
+
+    xTaskCreatePinnedToCore(&maxSonarInput, "sonar", 8048, NULL, 5, NULL, 0);
+
+    //xTaskCreatePinnedToCore(&uartTestTask, "uart", 8048, NULL, 5, NULL, 0);
     //xTaskCreatePinnedToCore(&A6TestTask, "A6", 8048, NULL, 5, NULL, 0);
 
 

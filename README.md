@@ -48,6 +48,26 @@ while (times-->0) {
 
 }
 ```
+Not very successful. Instead I soldered the TTL jumper on the back of the sensor.
+Connected PIN 7-GND to gnd. PIN 6 to vcc 3.3V and PIN5 Serial output to pin 2 of the ESP32.
+There was problems flashing the software but when disconntcting PIN 2 during flashing. It worked fine.
+See ![screenlog.0](screenlog.0) for the results and compare when moving sesnor backwards 10mm each time.
+The sensor transmits R0123^M 2 times every second.
+
+```
+  while(1) {
+    while (data[0]!='R') {
+         len=uart_read_bytes(uart_num, data, 1, 100 / portTICK_RATE_MS);
+     }
+     len = uart_read_bytes(uart_num, data, 4, 500 / portTICK_RATE_MS);
+     if (len==4) {
+         data[len]=0;
+         //data[len+1]=0;
+         printf("got %d:%s\n",len,data);
+     }
+  }
+```
+
 
 #Start qemu
 
