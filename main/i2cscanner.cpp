@@ -14,8 +14,8 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 
-#define SDAPIN (GPIO_NUM_22)
-#define SCLPIN (GPIO_NUM_23)
+#define SDAPIN (GPIO_NUM_21)
+#define SCLPIN (GPIO_NUM_22)
 
 static char tag[]="i2cscanner";
 
