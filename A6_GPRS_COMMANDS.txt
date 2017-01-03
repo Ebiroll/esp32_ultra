@@ -1,0 +1,73 @@
+These commands was used to connect and send data to Thingspeak.
+Also the result from the modem was recorded.
+
+
+
+AT+CGATT=1
+
+
++CTZV:17/01/03,14:26:30,+01
+
++CTZV:17/01/03,14:26:30,+01
+
+OK
+
+AT+CGDCONT=1,"IP","online.telia.se"
+
+OK
+
+AT+CIPSTART="TCP",184.106.153.149,80
+
++CTZV:17/01/03,14:34:36,+01
+
++CTZV:17/01/03,14:34:36,+01
+
+CONNECT OK
+
+OK
+
+
+------- Too slow-- got disconnected?
+
+
++TCPCLOSED:0
+
+OK
+
+OK
+AT+CIPSTATUS
+
+
++CIPSTATUS:0,IP INITIAL  
+1,IP INITIAL  
+2,IP INITIAL  
+3,IP INITIAL  
+4,IP INITIAL  
+5,IP INITIAL  
+6,IP INITIAL  
+7,IP INITIAL  
+
+
+OK
+
+----- If connected you could send data -------
+
+AT+CIPSEND
+
+Response ”>”, then type data for send, tap CTRL+Z to send
+
+
+AT+CIPCLOSE
+
+There are at most 1024 bytes that can be sent at a time.
+
+
+----------------------------
+AT+CSTT=? 
+
++CSTT: "APN", "USER", "PWD"
+
+OK
+
+
+

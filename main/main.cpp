@@ -36,6 +36,8 @@ SOFTWARE.
 #include "esp_log.h"
 //#include "driver/adc.h"
 #include <sys/time.h>
+#include "HardwareSerial.h"
+#include "ThingspeakConnection.h"
 
 
 #define ECHO_PIN GPIO_NUM_4
@@ -158,7 +160,7 @@ static void uartTestTask(void *inpar) {
 
 }
 
-char echoLine[256];
+char echoLine[512];
 
 
 // This task only echoes what is received on UART2
@@ -189,6 +191,11 @@ static void uartECHOTask(void *inpar) {
      data=readLine(uart_num,echoLine,256);
      vTaskDelay(100 / portTICK_PERIOD_MS);
      printf("U2:%s\n",data);
+     int len=strlen(data);
+     data[len]='\n';
+     data[len+1]=0;     
+     uart_tx_chars(UART_NUM_1, (const char*)data,strlen(data));   
+
      //uart_tx_chars(uart_num, (const char*)data,strlen(test_str));   
   }
 
@@ -222,7 +229,7 @@ uint32_t get_usec() {
 
 static void A6TestTask(void *data) {
 
-    A6lib A6l(7, 8);
+    A6lib A6l(17, 16);
     A6httplib httprequest(&A6l);
 
     A6l.blockUntilReady(115200);
@@ -233,6 +240,39 @@ static void A6TestTask(void *data) {
     httprequest.getResponseData(rcvd_data);
 
 }
+
+//
+// Use the class ThinspeakConnection to try send data to thingspeak 
+static void A6Thingspeak(void *data) {
+
+  HardwareSerial* A6conn = new HardwareSerial(2);
+  A6conn->begin(115200,SERIAL_8N1,16,17);
+
+  Serial.begin(115200);
+
+  ThingspeakConnection connection(*A6conn);
+  float bat=2.0;
+  int sensor1=10;
+  int sensor2=20;
+
+  boolean pushSuccess = connection.tryPushToThingSpeak(bat, sensor1, sensor2);
+  if (pushSuccess) {
+     printf("Logg success");
+  }
+  else 
+  {
+     printf("Logg falied\n");      
+  }
+
+}
+
+//
+// Use the module a6_ts try send data to thingspeak 
+static void A6_TS(void *data) {
+
+
+}
+
 
 //
 // Toggle trig pin and wait for input on echo pin 
@@ -314,34 +354,109 @@ static void analogeDistanceTask(void *inpar) {
 
 char line[256];
 
+//
+// Wait for input on  
+//
+static void uartLoopTask(void *inpar)
+{
+    bool ultraDistanceRunning = false;
+    QueueHandle_t uart_queue;
+
+    // Could not get to work with UART0 
+    uart_port_t uart_num = UART_NUM_1; // uart port number
+    uart_config_t uart_config = {
+        .baud_rate = 115200,                   //baudrate
+        .data_bits = UART_DATA_8_BITS,         //data bit mode
+        .parity = UART_PARITY_DISABLE,         //parity mode
+        .stop_bits = UART_STOP_BITS_1,         //stop bit mode
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE, //hardware flow control(cts/rts)
+        .rx_flow_ctrl_thresh = 122,            //flow control threshold
+    };
+    ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
+
+    // Should be set
+    ESP_ERROR_CHECK(uart_set_pin(uart_num, 23, 19, -1, -1));
+
+    // driver_install, otherwise E (20206) uart: uart_read_bytes(841): uart driver error
+    ESP_ERROR_CHECK(uart_driver_install(uart_num, 512 * 2, 512 * 2, 10, &uart_queue, 0));
+    sprintf(line,"Select 1,2,3,4 or 5\n");
+    uart_tx_chars(UART_NUM_1, (const char *)line, strlen(line));
+    
+    printf("1. Scan i2c bus.\n");
+    printf("2. Ultrasound measure.\n");
+    printf("3. Echo to UART 2, add crlf before send.\n");
+    printf("4. Try connecting over gprs with A6Lib.\n");
+    printf("5. Try send data over gprs with A6Thingspeak.\n");
+
+
+    //#if 0
+    char *data;
+
+    while (true)
+    {
+        data = readLine(uart_num, line, 256);
+        if (strcmp(data, "1") == 0)
+        {
+            printf("I2CScanner\n");
+            I2CScanner();
+        }
+        else if (strcmp(data, "2") == 0)
+        {
+
+            if (!ultraDistanceRunning)
+            {
+                printf("starting ultra task\n");
+                xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
+                ultraDistanceRunning = true;
+            }
+        }
+        else if (strcmp(data, "3") == 0)
+        {
+            printf("exit to exit echo");
+            sprintf(line,"exit to exit echo\n");
+            uart_tx_chars(UART_NUM_1, (const char *)line, strlen(line));
+            data[0]=0;
+
+            xTaskCreatePinnedToCore(&uartECHOTask, "echo", 4096, NULL, 20, NULL, 0);
+            while ((strncmp(data, "exit",4) != 0))
+            {
+                data = readLine(uart_num, line, 256);
+                int len = strlen(data);
+                data[len] = '\r';
+                data[len + 1] = '\n';
+                data[len + 2] = 0;
+                // Echo to UART2
+                uart_tx_chars(UART_NUM_2, (const char *)data, strlen(data));
+            }
+            sprintf(line,"exited\n");
+            uart_tx_chars(UART_NUM_1, (const char *)line, strlen(line));
+        }
+        else if (strcmp(data, "4") == 0)
+        {
+            A6TestTask(NULL);
+        }
+        else if (strcmp(data, "5") == 0)
+        {
+            A6Thingspeak(NULL);
+        }
+        else
+        {
+            printf("1. Scan i2c bus.\n");
+            printf("2. Ultrasound measure.\n");
+            printf("3. Echo to UART 2, add crlf before send.\n");
+            printf("4. Try connecting over gprs with A6Lib.\n");
+            printf("5. Try send data over gprs with A6Thingspeak.\n");
+
+        }
+    }
+    //#endif
+}
 
 extern "C" void app_main(void)
 {
     nvs_flash_init();
-    bool ultraDistanceRunning=false;
-    QueueHandle_t uart_queue;
-
 
     //Serial.begin(115200);
-
-  // Crap!, must use UART1 for input, should work with uart 1
-  uart_port_t uart_num = UART_NUM_1;          // uart port number
-  uart_config_t uart_config = {
-      .baud_rate = 115200,                    //baudrate
-      .data_bits = UART_DATA_8_BITS,          //data bit mode
-      .parity = UART_PARITY_DISABLE,          //parity mode
-      .stop_bits = UART_STOP_BITS_1,          //stop bit mode
-      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,  //hardware flow control(cts/rts)
-      .rx_flow_ctrl_thresh = 122,             //flow control threshold
-  };
-  ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
-
-  // Should be set 
-  ESP_ERROR_CHECK( uart_set_pin(uart_num, 23, 19, -1, -1));
-
-  // driver_install, otherwise E (20206) uart: uart_read_bytes(841): uart driver error
-  ESP_ERROR_CHECK( uart_driver_install(uart_num, 512 * 2, 512 * 2, 10,  &uart_queue,0));
-
 
     // Note!! Sonar also uses UART 1
     //xTaskCreatePinnedToCore(&maxSonarInput, "sonar", 8048, NULL, 5, NULL, 0);
@@ -351,6 +466,8 @@ extern "C" void app_main(void)
 
     //xTaskCreatePinnedToCore(&A6TestTask, "A6", 8048, NULL, 5, NULL, 0);
     //xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
+
+    xTaskCreatePinnedToCore(&uartLoopTask, "loop", 4096, NULL, 20, NULL, 0);
 
 
 #if 0
@@ -376,52 +493,6 @@ extern "C" void app_main(void)
 // 
 
 
-   printf("1. Scan i2c bus.\n");
-   printf("2. Ultrasound measure.\n");
-   printf("3. Echo to UART 2, add crlf before send.\n");
-
-
-//#if 0
-  char *data;
-
-  while (true) {
-    data=readLine(uart_num,line,256);
-    if (strcmp(data,"1")==0) {
-        printf("I2CScanner\n");
-        I2CScanner();
-    } else if (strcmp(data,"2")==0) {
-
-    if (!ultraDistanceRunning) {
-        printf("starting ultra task\n");
-        xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
-        ultraDistanceRunning=true;
-    }
-    } else if (strcmp(data,"3")==0) {
-        printf("exit to exit echo");
-        xTaskCreatePinnedToCore(&uartECHOTask, "echo", 4096, NULL, 20, NULL, 0);
-        while ((strcmp(data,"exit")!=0)) {
-            data=readLine(uart_num,line,256);
-            int len=strlen(data);
-            data[len]='\r';
-            data[len+1]='\n';
-            data[len+2]=0;
-            // Echo to UART2
-            uart_tx_chars(UART_NUM_2, (const char*)data,strlen(data));   
-
-        }
-
-    }  else if (strcmp(data,"4")==0) {
-        A6TestTask(NULL);
-    }
-    else {
-        printf("1. Scan i2c bus.\n");
-        printf("2. Ultrasound measure.\n");
-        printf("3. Echo to UART 2, add crlf before send.\n");
-        printf("4. Try connecting over gprswith A6Lib.\n");
-
-    }
-  }
-//#endif
 
 
 }
