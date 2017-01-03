@@ -162,3 +162,21 @@ atd55510101
 ath
       Hangup
 
+-------------------------
+To check PIN code
+
+AT+CPIN?
+
+If you need to enter PIN-code, disable for next use
+AT+CPIN?
+>>> +CPIN: SIM PIN // pin codes need to be entered
+>>> OK
+
+AT+CPIN="9546"
+>>>; OK
+
+AT+CLCK="SC",0,"9546" // disable pin code
+>>> OK
+
+AT+CPIN?
+>>> +CPIN: READY
