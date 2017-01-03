@@ -2,9 +2,7 @@ These commands was used to connect and send data to Thingspeak.
 Also the result from the modem was recorded.
 
 
-
 AT+CGATT=1
-
 
 +CTZV:17/01/03,14:26:30,+01
 
@@ -16,7 +14,7 @@ AT+CGDCONT=1,"IP","online.telia.se"
 
 OK
 
-AT+CIPSTART="TCP",184.106.153.149,80
+AT+CIPSTART="TCP","184.106.153.149",80
 
 +CTZV:17/01/03,14:34:36,+01
 
@@ -56,6 +54,8 @@ AT+CIPSEND
 
 Response ”>”, then type data for send, tap CTRL+Z to send
 
+GET /update?api_key=8FKJRMLXT2CPYCVO &temp=1.0&distance=1&pressure=2&headers=false  HTTP/1.0\n\n\x1A
+
 
 AT+CIPCLOSE
 
@@ -69,5 +69,96 @@ AT+CSTT=?
 
 OK
 
+-------------------------------------
+When trying CIPSTART again, I get
++CME ERROR:50
 
+From manual it means,
+50  EXE_FAIL
+
+Also tried this,
+http://ipecho.net/
+
+AT+CIPSTART="TCP",146.255.36.1,80  
+
++CTZV:17/01/03,16:48:55,+01
+
++CTZV:17/01/03,16:48:55,+01
+
++CME ERROR:50
+
+------ From Manual TCP/IP operation ---
+
+at+cipstatus                    Check the status of TCP/IP
+
++IPSTATUS: IP INITIAL
+    Response, in the state of INITIAL
+OK
+
+AT+CIPSTART="TCP","124.42.0.80",7
+
+    Start TCP/IP, if the MS hadn’t attached to the
+    GPRS network, this command will fulfill all the
+    prepare task and make ready for TCP/IP data
+    transfer.
+
+
+CONNECT OK
+OK
+at+cipstatus
+               Check the status of TCP/IP
++IPSTATUS: CONNECT OK
+
+            Response, in the state of CONNECT
+OK
+at+cipsend
+> this is a test<ctl+z>
+ OK
+		Send data “this is a test” ended with ctrl+z
+ 
+at+cifsr
+
+              Check IP
+              10.8.18.69
+OK
+
+at+cipclose
+            Close a TCP/IP translation
+OK
+
+at+cipstatus
+
+               Check status
++IPSTATUS: IP CLOSE
+              In the state of IP CLOSE
+OK
+AT+CIPSHUT
+              Disconnect the wireless connection
+
+OK
+at+cipstatus
+
++IPSTATUS: IP INITIAL
+                 Return to the initial status
+OK
+
+
+----------------------------------------
+Version used.
+
+ati
+
+Ai Thinker Co.LTD
+A6 
+V03.03.20160830011H03
+
+OK
+
+--------------------
+To make a call, test phone-net connection
+
+atd55510101
+
+ath
+      Hangup
 
