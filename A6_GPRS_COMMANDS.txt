@@ -56,6 +56,11 @@ Response ”>”, then type data for send, tap CTRL+Z to send
 
 GET /update?api_key=8FKJRMLXT2CPYCVO &temp=1.0&distance=1&pressure=2&headers=false  HTTP/1.0\n\n\x1A
 
+	char end_c[2];
+	end_c[0]=0x1a;
+	end_c[1]='\0'; 
+
+
 
 AT+CIPCLOSE
 
