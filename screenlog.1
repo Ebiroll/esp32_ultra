@@ -1,0 +1,119 @@
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+ets Jun  8 2016 00:22:57
+
+rst:0x10 (RTCWDT_RTC_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0x00
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3ffc0008,len:4
+load:0x3ffc000c,len:2056
+load:0x40078000,len:3512
+load:0x40080000,len:260
+entry 0x40080034
+[0;32mI (433) heap_alloc_caps: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (433) heap_alloc_caps: At 3FFB2148 len 0002DEB8 (183 KiB): DRAM[0m
+[0;32mI (436) heap_alloc_caps: At 3FFE8000 len 00018000 (96 KiB): D/IRAM[0m
+[0;32mI (443) heap_alloc_caps: At 40091224 len 0000EDDC (59 KiB): IRAM[0m
+[0;32mI (449) cpu_start: Pro cpu up.[0m
+[0;32mI (453) cpu_start: Single core mode[0m
+[0;32mI (457) cpu_start: Pro cpu start user code[0m
+[0;32mI (484) cpu_start: Starting scheduler on PRO CPU.[0m
+[0;32mI (530) ultra: Setting UART configuration number 1...[0m
+[0;32mI (530) uart: queue free spaces: 10[0m
+1. Scan i2c bus.
+2. Ultrasound measure.
+3. Echo to UART 2, add crlf before send.
+exit to exit echo[0;32mI (7695) ultra: Setting UART configuration number 2...[0m
+[0;32mI (7696) uart: queue free spaces: 10[0m
+ESP32 uart echo
+Guru Meditation Error: Core  0 panic'ed (Interrupt wdt timeout on CPU0)
+Register dump:
+PC      : 0x400d0e38  PS      : 0x00060034  A0      : 0x800830b7  A1      : 0x3ffb1420  
+A2      : 0x00000001  A3      : 0x00060023  A4      : 0x00060021  A5      : 0x3ffb1440  
+A6      : 0x00000001  A7      : 0x3ffb003c  A8      : 0x80082b91  A9      : 0x0000ff00  
+A10     : 0x00060023  A11     : 0x00000000  A12     : 0x00060023  A13     : 0xb33f0000  
+A14     : 0xb33fffff  A15     : 0x00000006  SAR     : 0x00000016  EXCCAUSE: 0x00000005  
+EXCVADDR: 0x00000000  LBEG    : 0x4000c2e0  LEND    : 0x4000c2f6  LCOUNT  : 0xffffffff  
+
+Backtrace: 0x400d0e38:0x3ffb1420 0x400830b7:0x3ffb1440 0x40082155:0x3ffb1460 0x40080ebc:0x3ffb14b0
+
+Rebooting...
+ets Jun  8 2016 00:22:57
+
+rst:0x3 (SW_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0x00
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3ffc0008,len:4
+load:0x3ffc000c,len:2056
+load:0x40078000,len:3512
+load:0x40080000,len:260
+entry 0x40080034
+[0;32mI (925) heap_alloc_caps: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (926) heap_alloc_caps: At 3FFB2148 len 0002DEB8 (183 KiB): DRAM[0m
+[0;32mI (955) heap_alloc_caps: At 3FFE8000 len 00018000 (96 KiB): D/IRAM[0m
+[0;32mI (1019) heap_alloc_caps: At 40091224 len 0000EDDC (59 KiB): IRAM[0m
+[0;32mI (1081) cpu_start: Pro cpu up.[0m
+[0;32mI (1116) cpu_start: Single core mode[0m
+[0;32mI (1156) cpu_start: Pro cpu start user code[0m
+[0;32mI (1316) cpu_start: Starting scheduler on PRO CPU.[0m
+[0;32mI (1362) ultra: Setting UART configuration number 1...[0m
+[0;32mI (1362) uart: queue free spaces: 10[0m
+1. Scan i2c bus.
+2. Ultrasound measure.
+3. Echo to UART 2, add crlf before send.
+exit to exit echo[0;32mI (7308) ultra: Setting UART configuration number 2...[0m
+[0;32mI (7308) uart: queue free spaces: 10[0m
+ESP32 uart echo
+U2:
+U2:^CINIT: 1, 0, 0
+U2:
+U2:^CINIT: 2, 32, 41891
+U2:
+U2:^STN: 3
+U2:
+U2:^CINIT: 4, 8192, 3
+U2:
+U2:^CINIT: 8, 2048, 1
+U2:
+U2:^CINIT: 16, 0, 1638420
+U2:
+U2:^CINIT: 32, 0, 0
+U2:
+U2:+CREG: 0
+Guru Meditation Error: Core  0 panic'ed (Interrupt wdt timeout on CPU0)
+Register dump:
+PC      : 0x400d0e38  PS      : 0x00060034  A0      : 0x800830b7  A1      : 0x3ffb1420  
+A2      : 0x3ffb74c4  A3      : 0x00060023  A4      : 0x00060021  A5      : 0xb33f0000  
+A6      : 0xb33fffff  A7      : 0x3ffb003c  A8      : 0xb33fffff  A9      : 0xb33f0000  
+A10     : 0x00060023  A11     : 0x00060023  A12     : 0x00060023  A13     : 0xb33f0000  
+A14     : 0xb33fffff  A15     : 0x09f27a70  SAR     : 0x00000018  EXCCAUSE: 0x00000005  
+EXCVADDR: 0x00000000  LBEG    : 0x4000c2e0  LEND    : 0x4000c2f6  LCOUNT  : 0xffffffff  
+
+Backtrace: 0x400d0e38:0x3ffb1420 0x400830b7:0x3ffb1440 0x40082155:0x3ffb1460 0x40080ebc:0x3ffb14b0
+
+Rebooting...
+ets Jun  8 2016 00:22:57
+
+rst:0x3 (SW_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0x00
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3ffc0008,len:4
+load:0x3ffc000c,len:2056
+load:0x40078000,len:3512
+load:0x40080000,len:260
+entry 0x40080034
+[0;32mI (925) heap_alloc_caps: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (926) heap_alloc_caps: At 3FFB2148 len 0002DEB8 (183 KiB): DRAM[0m
+[0;32mI (955) heap_alloc_caps: At 3FFE8000 len 00018000 (96 KiB): D/IRAM[0m
+[0;32mI (1019) heap_alloc_caps: At 40091224 len 0000EDDC (59 KiB): IRAM[0m
+[0;32mI (1081) cpu_start: Pro cpu up.[0m
+[0;32mI (1116) cpu_start: Single core mode[0m
+[0;32mI (1156) cpu_start: Pro cpu start user code[0m
+[0;32mI (1316) cpu_start: Starting scheduler on PRO CPU.[0m
+[0;32mI (1362) ultra: Setting UART configuration number 1...[0m
+[0;32mI (1362) uart: queue free spaces: 10[0m
+1. Scan i2c bus.
+2. Ultrasound measure.
+3. Echo to UART 2, add crlf before send.

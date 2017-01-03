@@ -319,13 +319,36 @@ extern "C" void app_main(void)
 {
     nvs_flash_init();
     bool ultraDistanceRunning=false;
+    QueueHandle_t uart_queue;
 
-    Serial.begin(115200);
+
+    //Serial.begin(115200);
+
+  // Crap!, must use UART1 for input, should work with uart 1
+  uart_port_t uart_num = UART_NUM_1;          // uart port number
+  uart_config_t uart_config = {
+      .baud_rate = 115200,                    //baudrate
+      .data_bits = UART_DATA_8_BITS,          //data bit mode
+      .parity = UART_PARITY_DISABLE,          //parity mode
+      .stop_bits = UART_STOP_BITS_1,          //stop bit mode
+      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,  //hardware flow control(cts/rts)
+      .rx_flow_ctrl_thresh = 122,             //flow control threshold
+  };
+  ESP_LOGI(TAG, "Setting UART configuration number %d...", uart_num);
+
+  // Should be set 
+  ESP_ERROR_CHECK( uart_set_pin(uart_num, 23, 19, -1, -1));
+
+  // driver_install, otherwise E (20206) uart: uart_read_bytes(841): uart driver error
+  ESP_ERROR_CHECK( uart_driver_install(uart_num, 512 * 2, 512 * 2, 10,  &uart_queue,0));
 
 
-    xTaskCreatePinnedToCore(&maxSonarInput, "sonar", 8048, NULL, 5, NULL, 0);
+    // Note!! Sonar also uses UART 1
+    //xTaskCreatePinnedToCore(&maxSonarInput, "sonar", 8048, NULL, 5, NULL, 0);
 
+    // Continusly transmit on uart2, (for qemu tests)
     //xTaskCreatePinnedToCore(&uartTestTask, "uart", 8048, NULL, 5, NULL, 0);
+
     //xTaskCreatePinnedToCore(&A6TestTask, "A6", 8048, NULL, 5, NULL, 0);
     //xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
 
@@ -351,48 +374,54 @@ extern "C" void app_main(void)
 
 
 // 
+
+
    printf("1. Scan i2c bus.\n");
    printf("2. Ultrasound measure.\n");
    printf("3. Echo to UART 2, add crlf before send.\n");
 
 
-  char *data=readLine(UART_NUM_0,line,256);
+//#if 0
+  char *data;
 
+  while (true) {
+    data=readLine(uart_num,line,256);
+    if (strcmp(data,"1")==0) {
+        printf("I2CScanner\n");
+        I2CScanner();
+    } else if (strcmp(data,"2")==0) {
 
-  if (strcmp(data,"1")==0) {
-      I2CScanner();
-  } else if (strcmp(data,"2")==0) {
+    if (!ultraDistanceRunning) {
+        printf("starting ultra task\n");
+        xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
+        ultraDistanceRunning=true;
+    }
+    } else if (strcmp(data,"3")==0) {
+        printf("exit to exit echo");
+        xTaskCreatePinnedToCore(&uartECHOTask, "echo", 4096, NULL, 20, NULL, 0);
+        while ((strcmp(data,"exit")!=0)) {
+            data=readLine(uart_num,line,256);
+            int len=strlen(data);
+            data[len]='\r';
+            data[len+1]='\n';
+            data[len+2]=0;
+            // Echo to UART2
+            uart_tx_chars(UART_NUM_2, (const char*)data,strlen(data));   
 
-   if (!ultraDistanceRunning) {
-      xTaskCreatePinnedToCore(&ultraDistanceTask, "ultra", 4096, NULL, 20, NULL, 0);
-      ultraDistanceRunning=true;
-   }
-  } else if (strcmp(data,"3")==0) {
-      printf("exit to exit echo");
-      xTaskCreatePinnedToCore(&ultraDistanceTask, "echo", 4096, NULL, 20, NULL, 0);
-      while ((strcmp(data,"exit")!=0)) {
-          data=readLine(UART_NUM_0,line,256);
-          int len=strlen(data);
-          data[len]='\r';
-          data[len+1]='\n';
-          data[len+2]=0;
-          // Echo to UART2
-          uart_tx_chars(UART_NUM_2, (const char*)data,strlen(data));   
+        }
 
-      }
+    }  else if (strcmp(data,"4")==0) {
+        A6TestTask(NULL);
+    }
+    else {
+        printf("1. Scan i2c bus.\n");
+        printf("2. Ultrasound measure.\n");
+        printf("3. Echo to UART 2, add crlf before send.\n");
+        printf("4. Try connecting over gprswith A6Lib.\n");
 
-  }  else if (strcmp(data,"4")==0) {
-      A6TestTask(NULL);
+    }
   }
-  else {
-      printf("1. Scan i2c bus.\n");
-      printf("2. Ultrasound measure.\n");
-      printf("3. Echo to UART 2, add crlf before send.\n");
-      printf("4. Try connecting over gprswith A6Lib.\n");
-
-  }
-
-
+//#endif
 
 
 }
