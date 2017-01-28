@@ -58,6 +58,7 @@ extern "C" {
 
 // readline from readLine.c
 extern "C" char *readLine(uart_port_t uart,char *line,int len);
+extern "C" char *pollLine(uart_port_t uart,char *line,int len);
 
 
 
@@ -73,6 +74,9 @@ String host="ipinfo.io";
 String path="/ip";
 
 #define BUF_SIZE 512
+
+char echoLine[512];
+
 
 // The max sonar transmits R0000\n once exery 500ms
 static void maxSonarInput(void *inpar) {
@@ -145,6 +149,14 @@ static void uartTestTask(void *inpar) {
   printf("ESP32 uart Send\n");
   data = (uint8_t*) malloc(BUF_SIZE);
 
+  // Poll task..
+  //char *test=pollLine(uart_num,echoLine,256);
+  //int slen=strlen(echoLine);
+  //echoLine[slen]='\n';
+  //echoLine[slen+1]=0;
+  //printf("got %s\n",echoLine);
+
+
   while(1) {
      int len = uart_read_bytes(uart_num, data, BUF_SIZE, 1000 / portTICK_RATE_MS);
 
@@ -160,7 +172,6 @@ static void uartTestTask(void *inpar) {
 
 }
 
-char echoLine[512];
 
 
 // This task only echoes what is received on UART2
